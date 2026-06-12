@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG Neon Roguelite</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0b0c10;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+        }
+        /* HUD UI */
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            text-shadow: 0 0 8px #00f3ff;
+            z-index: 5;
+        }
+        .hud-text {
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin: 5px 0;
+            letter-spacing: 1px;
+        }
+        #controls-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+        /* Overlay Screens */
+        #upgradeScreen, #gameOverScreen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 12, 16, 0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        h1 {
+            font-size: 4rem;
+            color: #c500ff;
+            text-shadow: 0 0 20px #c500ff;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        .btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00f3ff;
+            color: #00f3ff;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3) inset, 0 0 15px rgba(0, 243, 255, 0.3);
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background: #00f3ff;
+            color: #000;
+            box-shadow: 0 0 25px #00f3ff inset, 0 0 25px #00f3ff;
+            transform: scale(1.05);
+        }
+        .danger-btn {
+            border-color: #ff003c;
+            color: #ff003c;
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3) inset, 0 0 15px rgba(255, 0, 60, 0.3);
+        }
+        .danger-btn:hover {
+            background: #ff003c;
+            color: #fff;
+            box-shadow: 0 0 25px #ff003c inset, 0 0 25px #ff003c;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Heads Up Display -->
+    <div id="ui">
+        <div class="hud-text" id="hpDisplay" style="color: #00f3ff;">HP: 100 / 100</div>
+        <div class="hud-text" id="floorDisplay" style="color: #c500ff;">Floor: 1</div>
+        <div class="hud-text" id="enemiesDisplay">Target: 10 Kills</div>
+    </div>
+    
+    <div id="controls-hint">WASD to Move | Click/Hold to Shoot</div>
+
+    <!-- Upgrade Screen (Progression) -->
+    <div id="upgradeScreen">
+        <h1>Floor Cleared!</h1>
+        <button class="btn" onclick="applyUpgrade('heal')">Max Heal & +20 HP</button>
+        <button class="btn" onclick="applyUpgrade('speed')">Boost Move Speed</button>
+        <button class="btn" onclick="applyUpgrade('fireRate')">Boost Fire Rate</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen">
+        <h1 style="color: #ff003c; text-shadow: 0 0 30px #ff003c;">SYSTEM FAILURE</h1>
+        <h2 id="finalFloorDisplay" style="margin-bottom: 30px;"></h2>
+        <button class="btn danger-btn" onclick="location.reload()">Reboot Run</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // --- GAME STATE ---
+        let gameState = "playing"; // playing, upgrade, gameover
+        let currentFloor = 1;
+        let enemiesToKill = 10;
+        let enemiesKilled = 0;
+        let animationId;
+
+        // UI Elements
+        const hpUI = document.getElementById('hpDisplay');
+        const floorUI = document.getElementById('floorDisplay');
+        const enemiesUI = document.getElementById('enemiesDisplay');
+        const upgradeScreen = document.getElementById('upgradeScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+
+        // --- INPUT HANDLING ---
+        const keys = { w: false, a: false, s: false, d: false };
+        const mouse = { x: canvas.width / 2, y: canvas.height / 2, down: false };
+
+        window.addEventListener('keydown', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false; });
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mousedown', () => mouse.down = true);
+        window.addEventListener('mouseup', () => mouse.down = false);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // --- CLASSES ---
+        class Player {
+            constructor(x, y) {
+                this.x = x; this.y = y;
+                this.radius = 16;
+                this.color = '#00f3ff';
+                this.speed = 4;
+                this.maxHp = 100;
+                this.hp = 100;
+                this.fireRate = 15; // Lower is faster
+                this.fireTimer = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+            update() {
+                // Movement
+                if (keys.w && this.y > this.radius) this.y -= this.speed;
+                if (keys.s && this.y < canvas.height - this.radius) this.y += this.speed;
+                if (keys.a && this.x > this.radius) this.x -= this.speed;
+                if (keys.d && this.x < canvas.width - this.radius) this.x += this.speed;
+
+                // Shooting
+                if (mouse.down && this.fireTimer >= this.fireRate) {
+                    const angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+                    const velocity = { x: Math.cos(angle) * 10, y: Math.sin(angle) * 10 };
+                    projectiles.push(new Projectile(this.x, this.y, 6, '#c500ff', velocity));
+                    this.fireTimer = 0;
+                }
+                this.fireTimer++;
+                this.draw();
+            }
+        }
+
+        class Projectile {
+            constructor(x, y, radius, color, velocity) {
+                this.x = x; this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.velocity = velocity;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.draw();
+            }
+        }
+
+        class Enemy {
+            constructor(x, y, radius, color, speed, hp) {
+                this.x = x; this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.speed = speed;
+                this.hp = hp;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            update() {
+                // Chase Player
+                const angle = Math.atan2(player.y - this.y, player.x - this.x);
+                this.x += Math.cos(angle) * this.speed;
+                this.y += Math.sin(angle) * this.speed;
+                this.draw();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, radius, color, velocity) {
+                this.x = x; this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.velocity = velocity;
+                this.alpha = 1;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.x *= 0.98; // friction
+                this.velocity.y *= 0.98;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.02;
+                this.draw();
+            }
+        }
+
+        // --- INSTANTIATION ---
+        let player = new Player(canvas.width / 2, canvas.height / 2);
+        let projectiles = [];
+        let enemies = [];
+        let particles = [];
+
+        function spawnEnemy() {
+            if (gameState !== "playing") return;
+            
+            // Random spawn at canvas edges
+            const radius = Math.random() * 10 + 10;
+            let x, y;
+            if (Math.random() < 0.5) {
+                x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+                y = Math.random() * canvas.height;
+            } else {
+                x = Math.random() * canvas.width;
+                y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+            }
+
+            const color = `hsl(${Math.random() * 50}, 100%, 50%)`; // Red/Orange/Yellow neon
+            const speed = (Math.random() * 1.5 + 1) + (currentFloor * 0.2); // gets faster per floor
+            const hp = currentFloor * 2; // gets tougher per floor
+
+            enemies.push(new Enemy(x, y, radius, '#ff003c', speed, hp));
+        }
+
+        let spawnInterval = setInterval(spawnEnemy, 1000);
+
+        function updateUI() {
+            hpUI.innerText = `HP: ${player.hp} / ${player.maxHp}`;
+            floorUI.innerText = `Floor: ${currentFloor}`;
+            enemiesUI.innerText = `Target: ${enemiesToKill - enemiesKilled} Kills`;
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                particles.push(new Particle(x, y, Math.random() * 3 + 1, color, {
+                    x: (Math.random() - 0.5) * (Math.random() * 8),
+                    y: (Math.random() - 0.5) * (Math.random() * 8)
+                }));
+            }
+        }
+
+        // --- CORE GAME LOOP ---
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            if (gameState !== "playing") return;
+
+            // Draw Background with trail effect
+            ctx.fillStyle = 'rgba(11, 12, 16, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            player.update();
+            updateUI();
+
+            // Handle Particles
+            particles.forEach((particle, index) => {
+                if (particle.alpha <= 0) particles.splice(index, 1);
+                else particle.update();
+            });
+
+            // Handle Projectiles
+            projectiles.forEach((projectile, pIndex) => {
+                projectile.update();
+                // Remove off-screen projectiles
+                if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
+                    setTimeout(() => projectiles.splice(pIndex, 1), 0);
+                }
+            });
+
+            // Handle Enemies
+            enemies.forEach((enemy, eIndex) => {
+                enemy.update();
+
+                // Collision: Enemy hits Player
+                const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+                if (dist - enemy.radius - player.radius < 1) {
+                    player.hp -= 10;
+                    createExplosion(player.x, player.y, player.color);
+                    enemies.splice(eIndex, 1);
+                    
+                    // Game Over Trigger
+                    if (player.hp <= 0) {
+                        gameState = "gameover";
+                        document.getElementById('finalFloorDisplay').innerText = `You Reached Floor ${currentFloor}`;
+                        gameOverScreen.style.display = 'flex';
+                    }
+                }
+
+                // Collision: Projectile hits Enemy
+                projectiles.forEach((projectile, pIndex) => {
+                    const distToEnemy = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+                    if (distToEnemy - enemy.radius - projectile.radius < 1) {
+                        // Create sparks
+                        createExplosion(enemy.x, enemy.y, '#c500ff');
+                        
+                        setTimeout(() => projectiles.splice(pIndex, 1), 0);
+                        enemy.hp -= 1;
+
+                        if (enemy.hp <= 0) {
+                            createExplosion(enemy.x, enemy.y, enemy.color);
+                            setTimeout(() => enemies.splice(eIndex, 1), 0);
+                            enemiesKilled++;
+
+                            // Check Floor Progression
+                            if (enemiesKilled >= enemiesToKill) {
+                                triggerUpgradeMenu();
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // --- PROGRESSION SYSTEM ---
+        function triggerUpgradeMenu() {
+            gameState = "upgrade";
+            upgradeScreen.style.display = 'flex';
+            clearInterval(spawnInterval); // Stop spawning
+            
+            // Clear screen of current projectiles and enemies
+            projectiles = [];
+            enemies = [];
+        }
+
+        function applyUpgrade(type) {
+            if (type === 'heal') {
+                player.maxHp += 20;
+                player.hp = player.maxHp;
+            } else if (type === 'speed') {
+                player.speed += 1;
+            } else if (type === 'fireRate') {
+                player.fireRate = Math.max(3, player.fireRate - 3); // Capped maximum fire rate
+            }
+
+            // Increase Difficulty
+            currentFloor++;
+            enemiesKilled = 0;
+            enemiesToKill += 5; // Next floor needs more kills
+            
+            // Resume Game
+            upgradeScreen.style.display = 'none';
+            gameState = "playing";
+            
+            // Spawn enemies slightly faster
+            let newSpawnRate = Math.max(300, 1000 - (currentFloor * 50));
+            spawnInterval = setInterval(spawnEnemy, newSpawnRate);
+        }
+
+        // Start Loop
+        animate();
+    </script>
+</body>
+</html>
