@@ -25,17 +25,17 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 2px solid rgba(138, 43, 226, 0.3);
-    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
     animation: navGlow 3s ease-in-out infinite;
 }
 
 @keyframes navGlow {
     0%, 100% {
-        box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
     }
     50% {
-        box-shadow: 0 0 50px rgba(138, 43, 226, 0.4);
+        box-shadow: 0 0 50px rgba(0, 255, 255, 0.4);
     }
 }
 
@@ -48,11 +48,11 @@ body {
 .logo {
     font-size: 1.8rem;
     font-weight: bold;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+    text-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
     animation: logoFloat 3s ease-in-out infinite;
 }
 
@@ -82,7 +82,7 @@ body {
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, #8a2be2, #ff1493);
+    background: linear-gradient(90deg, #0099ff, #00ff88);
     transition: width 0.3s ease;
 }
 
@@ -96,7 +96,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+    background: linear-gradient(135deg, #0a0a0a 0%, #0a1a2e 50%, #0a0a0a 100%);
     position: relative;
     overflow: hidden;
 }
@@ -145,13 +145,13 @@ body {
     font-size: 6rem;
     font-weight: 900;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #8a2be2, #ff1493, #8a2be2);
+    background: linear-gradient(45deg, #0099ff, #00ff88, #0099ff);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: gradientShift 4s ease infinite, textGlow 2s ease-in-out infinite;
-    text-shadow: 0 0 50px rgba(138, 43, 226, 0.3);
+    text-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
     letter-spacing: 2px;
 }
 
@@ -162,23 +162,23 @@ body {
 
 @keyframes textGlow {
     0%, 100% { 
-        filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.5));
+        filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
     }
     50% { 
-        filter: drop-shadow(0 0 30px rgba(255, 20, 147, 0.8));
+        filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.8));
     }
 }
 
 .hero-subtitle {
     font-size: 1.8rem;
     margin-bottom: 0.5rem;
-    color: #fff;
+    color: #00ff88;
     animation: fadeInUp 1s ease-out 0.3s both;
 }
 
 .tagline {
     font-size: 1.2rem;
-    color: #b0b0b0;
+    color: #00ffcc;
     margin-bottom: 2rem;
     animation: fadeInUp 1s ease-out 0.6s both;
 }
@@ -198,36 +198,36 @@ body {
     padding: 15px 40px;
     font-size: 1.1rem;
     font-weight: bold;
-    border: 2px solid #8a2be2;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    border: 2px solid #0099ff;
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     color: white;
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
     animation: fadeInUp 1s ease-out 0.9s both, pulse 2s ease-in-out infinite 1s;
 }
 
 @keyframes pulse {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         transform: scale(1);
     }
     50% {
-        box-shadow: 0 0 40px rgba(255, 20, 147, 0.8);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
         transform: scale(1.05);
     }
 }
 
 .cta-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0 40px rgba(138, 43, 226, 0.8), 0 10px 30px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.8), 0 10px 30px rgba(0, 255, 255, 0.3);
 }
 
 /* ============ FEATURED GAMES SECTION ============ */
 .featured-games {
     padding: 5rem 0;
-    background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+    background: linear-gradient(180deg, #0a0a0a 0%, #0a1a2e 50%, #0a0a0a 100%);
     position: relative;
     overflow: hidden;
 }
@@ -239,14 +239,14 @@ body {
     left: 0;
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #8a2be2, transparent);
+    background: linear-gradient(90deg, transparent, #0099ff, transparent);
 }
 
 .section-title {
     font-size: 3rem;
     text-align: center;
     margin-bottom: 0.5rem;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -267,7 +267,7 @@ body {
 
 .section-subtitle {
     text-align: center;
-    color: #999;
+    color: #00ffcc;
     margin-bottom: 3rem;
     font-size: 1.1rem;
     opacity: 0;
@@ -281,8 +281,8 @@ body {
 }
 
 .game-card {
-    background: rgba(138, 43, 226, 0.1);
-    border: 2px solid rgba(138, 43, 226, 0.3);
+    background: rgba(0, 255, 136, 0.05);
+    border: 2px solid rgba(0, 255, 136, 0.3);
     border-radius: 15px;
     padding: 2rem;
     text-align: center;
@@ -317,10 +317,10 @@ body {
 }
 
 .game-card:hover {
-    border-color: #ff1493;
-    background: rgba(138, 43, 226, 0.2);
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.2);
     transform: translateY(-10px);
-    box-shadow: 0 10px 40px rgba(138, 43, 226, 0.4), 0 0 20px rgba(255, 20, 147, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4), 0 0 20px rgba(0, 255, 255, 0.3);
 }
 
 .game-icon {
@@ -345,11 +345,11 @@ body {
 .game-card h3 {
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    color: #ff1493;
+    color: #00ff88;
 }
 
 .game-card p {
-    color: #999;
+    color: #00ffcc;
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
 }
@@ -357,7 +357,7 @@ body {
 .play-btn {
     display: inline-block;
     padding: 10px 25px;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     color: white;
     text-decoration: none;
     border-radius: 25px;
@@ -365,18 +365,18 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
 }
 
 .play-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
 }
 
 /* ============ FEATURES SECTION ============ */
 .features {
     padding: 5rem 0;
-    background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+    background: linear-gradient(180deg, #0a0a0a 0%, #0a1a2e 50%, #0a0a0a 100%);
     position: relative;
 }
 
@@ -387,7 +387,7 @@ body {
     left: 0;
     width: 100%;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #8a2be2, transparent);
+    background: linear-gradient(90deg, transparent, #0099ff, transparent);
 }
 
 .features-grid {
@@ -398,8 +398,8 @@ body {
 }
 
 .feature-card {
-    background: rgba(255, 20, 147, 0.05);
-    border: 2px solid rgba(255, 20, 147, 0.2);
+    background: rgba(0, 255, 136, 0.05);
+    border: 2px solid rgba(0, 255, 136, 0.2);
     border-radius: 15px;
     padding: 2rem;
     text-align: center;
@@ -417,10 +417,10 @@ body {
 .feature-card:nth-child(6) { animation-delay: 0.8s; }
 
 .feature-card:hover {
-    border-color: #8a2be2;
-    background: rgba(138, 43, 226, 0.15);
+    border-color: #0099ff;
+    background: rgba(0, 255, 136, 0.15);
     transform: translateY(-8px);
-    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
 }
 
 .feature-icon {
@@ -432,20 +432,20 @@ body {
 .feature-card h3 {
     font-size: 1.3rem;
     margin-bottom: 0.5rem;
-    color: #8a2be2;
+    color: #0099ff;
 }
 
 .feature-card p {
-    color: #999;
+    color: #00ffcc;
     font-size: 0.95rem;
 }
 
 /* ============ STATS SECTION ============ */
 .stats {
     padding: 4rem 0;
-    background: linear-gradient(90deg, rgba(138, 43, 226, 0.1), rgba(255, 20, 147, 0.1));
-    border-top: 2px solid rgba(138, 43, 226, 0.3);
-    border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+    background: linear-gradient(90deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 200, 0.1));
+    border-top: 2px solid rgba(0, 255, 136, 0.3);
+    border-bottom: 2px solid rgba(0, 255, 136, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -468,7 +468,7 @@ body {
 
 .stat h3 {
     font-size: 2.5rem;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -476,7 +476,7 @@ body {
 }
 
 .stat p {
-    color: #999;
+    color: #00ffcc;
     font-size: 1.1rem;
 }
 
@@ -484,14 +484,14 @@ body {
 .cta-section {
     padding: 5rem 0;
     text-align: center;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 20, 147, 0.1));
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 200, 0.1));
     position: relative;
 }
 
 .cta-section h2 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
-    background: linear-gradient(45deg, #8a2be2, #ff1493);
+    background: linear-gradient(45deg, #0099ff, #00ff88);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -501,7 +501,7 @@ body {
 
 .cta-section p {
     font-size: 1.2rem;
-    color: #999;
+    color: #00ffcc;
     margin-bottom: 2rem;
     opacity: 0;
     animation: slideInAndFadeIn 0.8s ease-out 0.2s forwards;
@@ -509,8 +509,8 @@ body {
 
 /* ============ FOOTER ============ */
 .footer {
-    background: linear-gradient(180deg, #1a0a2e 0%, #0a0a0a 100%);
-    border-top: 2px solid rgba(138, 43, 226, 0.3);
+    background: linear-gradient(180deg, #0a1a2e 0%, #0a0a0a 100%);
+    border-top: 2px solid rgba(0, 255, 136, 0.3);
     padding: 3rem 0 1rem;
     color: #999;
 }
@@ -523,7 +523,7 @@ body {
 }
 
 .footer-section h3 {
-    color: #8a2be2;
+    color: #0099ff;
     margin-bottom: 1rem;
 }
 
@@ -542,7 +542,7 @@ body {
 }
 
 .footer-section a:hover {
-    color: #ff1493;
+    color: #00ff88;
 }
 
 .social-links {
@@ -553,21 +553,21 @@ body {
 .social-icon {
     display: inline-block;
     padding: 8px 15px;
-    border: 1px solid rgba(138, 43, 226, 0.3);
+    border: 1px solid rgba(0, 255, 136, 0.3);
     border-radius: 20px;
     font-size: 0.9rem;
     transition: all 0.3s ease;
 }
 
 .social-icon:hover {
-    border-color: #ff1493;
-    background: rgba(255, 20, 147, 0.1);
+    border-color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
 }
 
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(138, 43, 226, 0.2);
+    border-top: 1px solid rgba(0, 255, 136, 0.2);
     font-size: 0.9rem;
 }
 
