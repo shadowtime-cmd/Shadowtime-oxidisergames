@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shadowtime - Neon Assault</title>
+    <title>Shadowtime - Cinematic Neon Assault</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #050508;
+            background-color: #030305;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
@@ -24,14 +24,14 @@
             top: 20px;
             left: 20px;
             pointer-events: none;
-            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
             z-index: 5;
         }
         .hud-text {
             font-size: 1.2rem;
             font-weight: 900;
-            margin: 5px 0;
-            letter-spacing: 1px;
+            margin: 6px 0;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
         #controls-hint {
@@ -39,7 +39,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.35);
             pointer-events: none;
             text-align: center;
             font-size: 0.85rem;
@@ -50,31 +50,31 @@
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 8, 0.9);
+            background: rgba(3, 3, 5, 0.92);
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
         }
         h1 {
             font-size: 3.5rem;
             margin-bottom: 10px;
             text-transform: uppercase;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
         p.sub-msg {
             font-size: 1.1rem;
-            color: #a0a5b5;
-            max-width: 500px;
+            color: #8a90a0;
+            max-width: 520px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             line-height: 1.6;
         }
         .btn {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.03);
             border: 2px solid #00f3ff;
             color: #00f3ff;
             padding: 14px 40px;
@@ -84,35 +84,35 @@
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             text-transform: uppercase;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2) inset;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.15) inset;
             border-radius: 4px;
-            width: 290px;
+            width: 300px;
             letter-spacing: 1px;
         }
         .btn:hover, .btn:active {
             background: #00f3ff;
             color: #000;
-            box-shadow: 0 0 25px #00f3ff;
+            box-shadow: 0 0 30px #00f3ff;
         }
         .danger-btn {
             border-color: #ff0055;
             color: #ff0055;
-            box-shadow: 0 0 15px rgba(255, 0, 85, 0.2) inset;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.15) inset;
         }
         .danger-btn:hover, .danger-btn:active {
             background: #ff0055;
             color: #fff;
-            box-shadow: 0 0 25px #ff0055;
+            box-shadow: 0 0 30px #ff0055;
         }
         .victory-btn {
             border-color: #39ff14;
             color: #39ff14;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2) inset;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.15) inset;
         }
         .victory-btn:hover, .victory-btn:active {
             background: #39ff14;
             color: #000;
-            box-shadow: 0 0 25px #39ff14;
+            box-shadow: 0 0 30px #39ff14;
         }
     </style>
 </head>
@@ -127,7 +127,7 @@
     <div id="controls-hint">Desktop: WASD to Move, Mouse to Aim/Shoot | Mobile: Left Stick to Move, Right Stick to Aim/Shoot</div>
 
     <div id="upgradeScreen" class="overlay">
-        <h1 style="color: #b500ff; text-shadow: 0 0 20px #b500ff;">SECTOR CLEARED</h1>
+        <h1 style="color: #b500ff; text-shadow: 0 0 25px #b500ff;">SECTOR CLEARED</h1>
         <p class="sub-msg">Select a matrix modification framework to adapt to harder security threats in the next level.</p>
         <button class="btn" onclick="applyUpgrade('heal')">Repair Hull & Max HP +20</button>
         <button class="btn" onclick="applyUpgrade('speed')">Optimize Thruster Speed</button>
@@ -143,7 +143,7 @@
     <div id="victoryScreen" class="overlay">
         <h1 style="color: #39ff14; text-shadow: 0 0 30px #39ff14;">ARCADE CONQUERED</h1>
         <p class="sub-msg" style="color: #fff; font-size: 1.2rem; max-width: 600px;">
-            <strong>Incredible job, Pilot!</strong> You have successfully destroyed all hostile entities across all 10 security sectors of the mainframe. Thank you for testing out this custom engine framework on Shadowtime!
+            <strong>Incredible job, Pilot!</strong> You have successfully destroyed all hostile entities across all 10 security sectors of the mainframe. Thank you for playing this custom engine build on Shadowtime!
         </p>
         <button class="btn victory-btn" onclick="location.reload()">Play Another Run</button>
     </div>
@@ -163,21 +163,21 @@
         const maxFloors = 10;
         let enemiesToKill = 10;
         let enemiesKilled = 0;
-        let animationId;
         let globalTicks = 0;
+        let spawnTimer = 0; // Robust frame-based tracking replaces setInterval
 
-        // Custom Sector/Arena configurations
+        // Enhanced Sector Styles with Dynamic Cinematic Gradients
         const arenaStyles = [
-            { bgGrid: '#11131c', walls: '#00f3ff', core: '#0b0c10' }, // Level 1
-            { bgGrid: '#20111a', walls: '#b500ff', core: '#0f050c' }, // Level 2
-            { bgGrid: '#1b2011', walls: '#39ff14', core: '#0a0d05' }, // Level 3
-            { bgGrid: '#241a11', walls: '#ffaa00', core: '#120c06' }, // Level 4
-            { bgGrid: '#112224', walls: '#00e5ff', core: '#051114' }, // Level 5
-            { bgGrid: '#241111', walls: '#ff0055', core: '#140505' }, // Level 6
-            { bgGrid: '#212411', walls: '#ccff00', core: '#0f1405' }, // Level 7
-            { bgGrid: '#1b1124', walls: '#e500ff', core: '#0b0514' }, // Level 8
-            { bgGrid: '#112418', walls: '#00ffaa', core: '#05140b' }, // Level 9
-            { bgGrid: '#2d112d', walls: '#ff00dd', core: '#1a051a' }  // Level 10 (Final)
+            { bgGrid: '#121626', walls: '#00f3ff', coreGradient: ['#04060f', '#090d1a'] }, // Level 1
+            { bgGrid: '#261222', walls: '#b500ff', coreGradient: ['#06030a', '#170614'] }, // Level 2
+            { bgGrid: '#142412', walls: '#39ff14', coreGradient: ['#030603', '#0a1708'] }, // Level 3
+            { bgGrid: '#291b10', walls: '#ffaa00', coreGradient: ['#060402', '#1a1007'] }, // Level 4
+            { bgGrid: '#0f2426', walls: '#00e5ff', coreGradient: ['#020608', '#06171a'] }, // Level 5
+            { bgGrid: '#2b1016', walls: '#ff0055', coreGradient: ['#070203', '#1c070c'] }, // Level 6
+            { bgGrid: '#242910', walls: '#ccff00', coreGradient: ['#050602', '#161a07'] }, // Level 7
+            { bgGrid: '#1e102b', walls: '#e500ff', coreGradient: ['#040207', '#13071c'] }, // Level 8
+            { bgGrid: '#102b1f', walls: '#00ffaa', coreGradient: ['#020705', '#071c12'] }, // Level 9
+            { bgGrid: '#331033', walls: '#ff00dd', coreGradient: ['#080208', '#210721'] }  // Level 10
         ];
 
         // --- CONTROLS HOOKS ---
@@ -200,13 +200,11 @@
             for (let i = 0; i < e.changedTouches.length; i++) {
                 const touch = e.changedTouches[i];
                 if (touch.clientX < window.innerWidth / 2 && !leftStick.active) {
-                    leftStick.active = true;
-                    leftStick.pointerId = touch.identifier;
+                    leftStick.active = true; leftStick.pointerId = touch.identifier;
                     leftStick.startX = touch.clientX; leftStick.startY = touch.clientY;
                     leftStick.curX = touch.clientX; leftStick.curY = touch.clientY;
                 } else if (touch.clientX >= window.innerWidth / 2 && !rightStick.active) {
-                    rightStick.active = true;
-                    rightStick.pointerId = touch.identifier;
+                    rightStick.active = true; rightStick.pointerId = touch.identifier;
                     rightStick.startX = touch.clientX; rightStick.startY = touch.clientY;
                     rightStick.curX = touch.clientX; rightStick.curY = touch.clientY;
                 }
@@ -250,18 +248,49 @@
             }
         });
 
-        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; initializeStars(); });
 
-        // --- SCENE DRAW ROUTINES ---
+        // --- CINEMATIC BACKGROUND SYSTEM ---
+        let backgroundStars = [];
+        function initializeStars() {
+            backgroundStars = [];
+            for (let i = 0; i < 65; i++) {
+                backgroundStars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 0.4 + 0.1,
+                    brightness: Math.random() * 0.5 + 0.3
+                });
+            }
+        }
+        initializeStars();
+
         function drawBackgroundArena() {
             const style = arenaStyles[currentFloor - 1] || arenaStyles[0];
-            ctx.fillStyle = style.core;
+            
+            // Create Cinematic Radial Core Light Gradient
+            let grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 10, canvas.width/2, canvas.height/2, canvas.width * 0.8);
+            grad.addColorStop(0, style.coreGradient[1]);
+            grad.addColorStop(1, style.coreGradient[0]);
+            ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Tech Grid Drawing
+            // Animate and Paint Background Stars
+            ctx.fillStyle = '#ffffff';
+            backgroundStars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) star.y = 0;
+                ctx.save();
+                ctx.globalAlpha = star.brightness + Math.sin(globalTicks * 0.02 + star.x) * 0.2;
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+                ctx.restore();
+            });
+
+            // Modern Grid lines setup
             ctx.strokeStyle = style.bgGrid;
             ctx.lineWidth = 1;
-            const gridSize = 60;
+            const gridSize = 70;
             for(let x = 0; x < canvas.width; x += gridSize) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
             }
@@ -269,13 +298,13 @@
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
 
-            // Outer border glowing lines
+            // Glimmering Outer Perimeter Boundary
             ctx.strokeStyle = style.walls;
             ctx.lineWidth = 6;
-            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 20;
             ctx.shadowColor = style.walls;
             ctx.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
-            ctx.shadowBlur = 0; // reset
+            ctx.shadowBlur = 0;
         }
 
         // --- COMPONENT ENTITIES ---
@@ -283,7 +312,7 @@
             constructor(x, y) {
                 this.x = x; this.y = y;
                 this.radius = 18;
-                this.speed = 4.5;
+                this.speed = 4.6;
                 this.maxHp = 100;
                 this.hp = 100;
                 this.fireRate = 14; 
@@ -295,36 +324,34 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                // Glow Engine Thruster trail
+                // Plasma Trail
                 if (keys.w || keys.s || keys.a || keys.d || leftStick.active) {
                     ctx.beginPath();
-                    ctx.moveTo(-16, -6); ctx.lineTo(-28, 0); ctx.lineTo(-16, 6);
-                    ctx.fillStyle = '#ffaa00';
+                    ctx.moveTo(-16, -5); ctx.lineTo(-30, 0); ctx.lineTo(-16, 5);
+                    ctx.fillStyle = '#ff7700';
                     ctx.shadowBlur = 15; ctx.shadowColor = '#ffaa00';
                     ctx.fill();
                 }
 
-                // Spaceship Hull geometry
+                // Spaceship Geometry Fighter Frame
                 ctx.beginPath();
-                ctx.moveTo(22, 0);       // Nose
-                ctx.lineTo(-14, -15);    // Left Wing tip
-                ctx.lineTo(-8, -5);      // Inner body left
-                ctx.lineTo(-8, 5);       // Inner body right
-                ctx.lineTo(-14, 15);     // Right Wing tip
+                ctx.moveTo(22, 0);       
+                ctx.lineTo(-14, -15);    
+                ctx.lineTo(-8, -5);      
+                ctx.lineTo(-8, 5);       
+                ctx.lineTo(-14, 15);     
                 ctx.closePath();
                 
-                ctx.fillStyle = '#0b0c10';
+                ctx.fillStyle = '#06080c';
                 ctx.fill();
                 ctx.strokeStyle = '#00f3ff';
                 ctx.lineWidth = 3;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = '#00f3ff';
+                ctx.shadowBlur = 12; ctx.shadowColor = '#00f3ff';
                 ctx.stroke();
                 ctx.restore();
                 ctx.shadowBlur = 0;
             }
             update() {
-                // Direction calculation matrix
                 let mvX = 0; let mvY = 0;
                 if (keys.w) mvY -= 1; if (keys.s) mvY += 1;
                 if (keys.a) mvX -= 1; if (keys.d) mvX += 1;
@@ -338,30 +365,22 @@
                     this.y += (mvY / len) * this.speed;
                 }
 
-                // Keep Player safely within visible custom arena boundary lines
-                const padding = this.radius + 6;
+                const padding = this.radius + 8;
                 if (this.x < padding) this.x = padding;
                 if (this.x > canvas.width - padding) this.x = canvas.width - padding;
                 if (this.y < padding) this.y = padding;
                 if (this.y > canvas.height - padding) this.y = canvas.height - padding;
 
-                // Rotational orientation matrix (Keyboard or Touchstick overrides)
                 if (rightStick.active && (Math.abs(rightStick.dirX) > 0.1 || Math.abs(rightStick.dirY) > 0.1)) {
                     this.angle = Math.atan2(rightStick.dirY, rightStick.dirX);
                 } else if (!leftStick.active) {
                     this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
                 }
 
-                // Automatic weapon trigger cycle loop
                 if (this.fireTimer >= this.fireRate) {
-                    if (mouse.down) {
-                        const vX = Math.cos(this.angle) * 11;
-                        const vY = Math.sin(this.angle) * 11;
-                        projectiles.push(new EnergyProjectile(this.x, this.y, vX, vY));
-                        this.fireTimer = 0;
-                    } else if (rightStick.active && (Math.abs(rightStick.dirX) > 0.1 || Math.abs(rightStick.dirY) > 0.1)) {
-                        const vX = Math.cos(this.angle) * 11;
-                        const vY = Math.sin(this.angle) * 11;
+                    if (mouse.down || (rightStick.active && (Math.abs(rightStick.dirX) > 0.1 || Math.abs(rightStick.dirY) > 0.1))) {
+                        const vX = Math.cos(this.angle) * 11.5;
+                        const vY = Math.sin(this.angle) * 11.5;
                         projectiles.push(new EnergyProjectile(this.x, this.y, vX, vY));
                         this.fireTimer = 0;
                     }
@@ -380,8 +399,8 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#b500ff';
-                ctx.shadowBlur = 10; ctx.shadowColor = '#b500ff';
+                ctx.fillStyle = '#d400ff';
+                ctx.shadowBlur = 10; ctx.shadowColor = '#d400ff';
                 ctx.fill();
                 ctx.shadowBlur = 0;
             }
@@ -398,7 +417,7 @@
                 this.radius = 18;
                 this.maxHp = 2 + (floorLevel * 1);
                 this.hp = this.maxHp;
-                this.speed = 1.6 + (floorLevel * 0.15);
+                this.speed = 1.6 + (floorLevel * 0.14);
                 this.pulsePhase = Math.random() * Math.PI;
                 this.color = arenaStyles[floorLevel - 1] ? arenaStyles[floorLevel - 1].walls : '#ff0055';
             }
@@ -406,38 +425,36 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Limbs animation mechanics calculation
-                let scale = 1 + Math.sin(globalTicks * 0.1 + this.pulsePhase) * 0.12;
+                let scale = 1 + Math.sin(globalTicks * 0.1 + this.pulsePhase) * 0.14;
 
-                // Cyber Droid Outriggers / Struts
+                // Animated Geometric Outer Matrices
                 ctx.strokeStyle = this.color;
                 ctx.lineWidth = 3;
-                ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12; ctx.shadowColor = this.color;
                 
                 ctx.strokeRect(-12 * scale, -12 * scale, 24 * scale, 24 * scale);
                 
-                // Central processing capsule core
+                // Tech Core Node
                 ctx.beginPath();
-                ctx.arc(0, 0, 7, 0, Math.PI * 2);
-                ctx.fillStyle = '#111';
+                ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#0a0a0f';
                 ctx.fill();
                 ctx.stroke();
 
-                // Dynamic Health Bar layout above the hostile entity
                 ctx.restore();
                 ctx.shadowBlur = 0;
 
-                let barW = 32;
+                // Glowing Floating Indicator Health Bar
+                let barW = 34;
                 let barH = 4;
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                ctx.fillRect(this.x - barW/2, this.y - this.radius - 10, barW, barH);
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.fillRect(this.x - barW/2, this.y - this.radius - 12, barW, barH);
                 
                 let ratio = Math.max(0, this.hp / this.maxHp);
                 ctx.fillStyle = this.color;
-                ctx.fillRect(this.x - barW/2, this.y - this.radius - 10, barW * ratio, barH);
+                ctx.fillRect(this.x - barW/2, this.y - this.radius - 12, barW * ratio, barH);
             }
             update() {
-                // Tracking algorithmic pursuit vector matrix towards target vector
                 const angle = Math.atan2(player.y - this.y, player.x - this.x);
                 this.x += Math.cos(angle) * this.speed;
                 this.y += Math.sin(angle) * this.speed;
@@ -449,9 +466,9 @@
             constructor(x, y, color) {
                 this.x = x; this.y = y;
                 this.color = color;
-                this.vel = { x: (Math.random() - 0.5) * 7, y: (Math.random() - 0.5) * 7 };
+                this.vel = { x: (Math.random() - 0.5) * 7.5, y: (Math.random() - 0.5) * 7.5 };
                 this.alpha = 1;
-                this.decay = Math.random() * 0.02 + 0.015;
+                this.decay = Math.random() * 0.02 + 0.016;
             }
             draw() {
                 ctx.save();
@@ -477,11 +494,8 @@
         let particles = [];
 
         function spawnSectorThreat() {
-            if (gameState !== "playing") return;
-            
-            // Border spawning safety check algorithms
             let x, y;
-            const pad = 40;
+            const pad = 50;
             if (Math.random() < 0.5) {
                 x = Math.random() < 0.5 ? -pad : canvas.width + pad;
                 y = Math.random() * canvas.height;
@@ -491,8 +505,6 @@
             }
             enemies.push(new DroidEnemy(x, y, currentFloor));
         }
-
-        let spawnInterval = setInterval(spawnSectorThreat, 1100 - (currentFloor * 40));
 
         function triggerExplosionMatrix(x, y, color) {
             for (let i = 0; i < 18; i++) {
@@ -506,16 +518,24 @@
             enemiesUI.innerText = `THREATS REMAINING: ${Math.max(0, enemiesToKill - enemiesKilled)}`;
         }
 
-        // --- HARDWARE CYCLE RENDER DRIVER ---
+        // --- CORE GAME LOOP ENGINE ---
         function animateEngineLoop() {
             animationId = requestAnimationFrame(animateEngineLoop);
             globalTicks++;
 
             if (gameState !== "playing") return;
 
-            // Paint Arena background layers
+            // 1. Paint Arena Background Layers and Starfield
             drawBackgroundArena();
             
+            // 2. Spawn Logic (Completely solid, frame-based controller replaces unreliable setInterval)
+            spawnTimer++;
+            let currentSpawnIntervalRate = Math.max(24, 75 - (currentFloor * 4.5)); // Drops frames between spawns linearly
+            if (spawnTimer >= currentSpawnIntervalRate) {
+                spawnSectorThreat();
+                spawnTimer = 0;
+            }
+
             player.update();
             syncHUDValues();
 
@@ -534,26 +554,26 @@
                 }
             }
 
-            // Render on-screen Touchsticks
+            // Render Touchsticks UI Overlays
             if (leftStick.active) {
                 ctx.beginPath(); ctx.arc(leftStick.startX, leftStick.startY, joystickRadius, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.22)'; ctx.lineWidth = 3; ctx.stroke();
                 ctx.beginPath(); ctx.arc(leftStick.startX + leftStick.dirX * joystickRadius, leftStick.startY + leftStick.dirY * joystickRadius, 16, 0, Math.PI * 2);
                 ctx.fillStyle = '#00f3ff'; ctx.fill();
             }
             if (rightStick.active) {
                 ctx.beginPath(); ctx.arc(rightStick.startX, rightStick.startY, joystickRadius, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(181, 0, 255, 0.25)'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.strokeStyle = 'rgba(181, 0, 255, 0.22)'; ctx.lineWidth = 3; ctx.stroke();
                 ctx.beginPath(); ctx.arc(rightStick.startX + rightStick.dirX * joystickRadius, rightStick.startY + rightStick.dirY * joystickRadius, 16, 0, Math.PI * 2);
                 ctx.fillStyle = '#b500ff'; ctx.fill();
             }
 
-            // Hostile entities logic execution
+            // Hostile Droids processing loop matrix
             for (let eIdx = enemies.length - 1; eIdx >= 0; eIdx--) {
                 let enemy = enemies[eIdx];
                 enemy.update();
 
-                // Structural collision: Enemy hits Player ship frame
+                // Structural Hull Crash Collision
                 const hitDist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
                 if (hitDist < enemy.radius + player.radius) {
                     player.hp -= 12;
@@ -562,19 +582,18 @@
                     
                     if (player.hp <= 0) {
                         gameState = "gameover";
-                        document.getElementById('finalFloorDisplay').innerText = `Your spaceship core fractured at Sector ${currentFloor}.`;
+                        document.getElementById('finalFloorDisplay').innerText = `Your spaceship hull ruptured inside Sector ${currentFloor}.`;
                         gameOverScreen.style.display = 'flex';
-                        clearInterval(spawnInterval);
                     }
                     continue;
                 }
 
-                // Laser projectile impact calculations loop
+                // Laser Weapon impact collision loops
                 for (let pIdx = projectiles.length - 1; pIdx >= 0; pIdx--) {
                     let proj = projectiles[pIdx];
                     const dmgDist = Math.hypot(proj.x - enemy.x, proj.y - enemy.y);
                     if (dmgDist < enemy.radius + proj.radius) {
-                        triggerExplosionMatrix(enemy.x, enemy.y, '#b500ff');
+                        triggerExplosionMatrix(enemy.x, enemy.y, '#d400ff');
                         projectiles.splice(pIdx, 1);
                         enemy.hp -= 1;
 
@@ -583,7 +602,6 @@
                             enemies.splice(eIdx, 1);
                             enemiesKilled++;
 
-                            // Verify level objective thresholds
                             if (enemiesKilled >= enemiesToKill) {
                                 triggerProgressionShift();
                             }
@@ -596,17 +614,15 @@
 
         // --- PLATFORM LEVEL SHIFT PROGRESSION ENGINE ---
         function triggerProgressionShift() {
-            clearInterval(spawnInterval);
             projectiles = [];
             enemies = [];
+            spawnTimer = 0;
             leftStick.active = false; rightStick.active = false;
 
             if (currentFloor >= maxFloors) {
-                // Grand Finale level cleared -> Trigger Victory screen
                 gameState = "victory";
                 document.getElementById('victoryScreen').style.display = 'flex';
             } else {
-                // Sector cleared -> Load Upgrades UI overlay modal
                 gameState = "upgrade";
                 document.getElementById('upgradeScreen').style.display = 'flex';
             }
@@ -624,17 +640,13 @@
 
             currentFloor++;
             enemiesKilled = 0;
-            enemiesToKill += 4; // Step up target metrics scale linearly
+            enemiesToKill += 4; 
             
             document.getElementById('upgradeScreen').style.display = 'none';
             gameState = "playing";
-            
-            // Overclock spawn loop interval configuration array matrix
-            let delayRate = Math.max(380, 1100 - (currentFloor * 65));
-            spawnInterval = setInterval(spawnSectorThreat, delayRate);
         }
 
-        // Fire engine execution loop thread
+        // Kick off main engine loop
         animateEngineLoop();
     </script>
 </body>
