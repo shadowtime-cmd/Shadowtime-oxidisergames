@@ -18,6 +18,20 @@
         canvas {
             display: block;
         }
+        /* Scanline Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
         /* HUD UI */
         #ui {
             position: absolute;
@@ -26,6 +40,12 @@
             pointer-events: none;
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
             z-index: 5;
+            background: rgba(3, 3, 5, 0.6);
+            padding: 15px 20px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
         }
         .hud-text {
             font-size: 1.2rem;
@@ -39,12 +59,17 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.7);
             pointer-events: none;
             text-align: center;
             font-size: 0.85rem;
-            width: 90%;
+            width: auto;
             letter-spacing: 0.5px;
+            background: rgba(3, 3, 5, 0.6);
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
         }
         /* Overlay Screens */
         .overlay {
@@ -269,10 +294,11 @@
         function drawBackgroundArena() {
             const style = arenaStyles[currentFloor - 1] || arenaStyles[0];
             
-            // Create Cinematic Radial Core Light Gradient
-            let grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 10, canvas.width/2, canvas.height/2, canvas.width * 0.8);
+            // Create Cinematic Radial Core Light Gradient with Vignette
+            let grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 10, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height) * 0.7);
             grad.addColorStop(0, style.coreGradient[1]);
-            grad.addColorStop(1, style.coreGradient[0]);
+            grad.addColorStop(0.6, style.coreGradient[0]);
+            grad.addColorStop(1, '#000000'); // Strong vignette edge
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -287,14 +313,20 @@
                 ctx.restore();
             });
 
-            // Modern Grid lines setup
-            ctx.strokeStyle = style.bgGrid;
-            ctx.lineWidth = 1;
+            // Cinematic Fading Grid Lines with Parallax Scroll
+            const gridScroll = (globalTicks * 0.5) % 70;
+
+            let gridGrad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height) * 0.5);
+            gridGrad.addColorStop(0, style.bgGrid);
+            gridGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.strokeStyle = gridGrad;
+            ctx.lineWidth = 1.5;
             const gridSize = 70;
-            for(let x = 0; x < canvas.width; x += gridSize) {
+            for(let x = gridScroll; x < canvas.width; x += gridSize) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
             }
-            for(let y = 0; y < canvas.height; y += gridSize) {
+            for(let y = gridScroll; y < canvas.height; y += gridSize) {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
 
@@ -324,30 +356,68 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                // Plasma Trail
+                // Layered Plasma Trail
                 if (keys.w || keys.s || keys.a || keys.d || leftStick.active) {
+                    // Outer glow
                     ctx.beginPath();
-                    ctx.moveTo(-16, -5); ctx.lineTo(-30, 0); ctx.lineTo(-16, 5);
-                    ctx.fillStyle = '#ff7700';
-                    ctx.shadowBlur = 15; ctx.shadowColor = '#ffaa00';
+                    ctx.moveTo(-14, -6); ctx.lineTo(-35, 0); ctx.lineTo(-14, 6);
+                    ctx.fillStyle = 'rgba(255, 119, 0, 0.6)';
+                    ctx.shadowBlur = 20; ctx.shadowColor = '#ffaa00';
+                    ctx.fill();
+
+                    // Inner bright core
+                    ctx.beginPath();
+                    ctx.moveTo(-14, -3); ctx.lineTo(-25, 0); ctx.lineTo(-14, 3);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowBlur = 10; ctx.shadowColor = '#ffffff';
                     ctx.fill();
                 }
 
-                // Spaceship Geometry Fighter Frame
+                // Detailed Spaceship Geometry
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00f3ff';
+
+                // Main Wing Hull
                 ctx.beginPath();
-                ctx.moveTo(22, 0);       
-                ctx.lineTo(-14, -15);    
-                ctx.lineTo(-8, -5);      
-                ctx.lineTo(-8, 5);       
-                ctx.lineTo(-14, 15);     
+                ctx.moveTo(24, 0);       // Nose
+                ctx.lineTo(8, -10);      // Front wing blend
+                ctx.lineTo(-12, -22);    // Outer wing tip
+                ctx.lineTo(-16, -16);    // Rear wing cut
+                ctx.lineTo(-10, -6);     // Inner engine block
+                ctx.lineTo(-10, 6);      // Inner engine block
+                ctx.lineTo(-16, 16);     // Rear wing cut
+                ctx.lineTo(-12, 22);     // Outer wing tip
+                ctx.lineTo(8, 10);       // Front wing blend
                 ctx.closePath();
-                
-                ctx.fillStyle = '#06080c';
+                ctx.fillStyle = '#05070a';
+                ctx.fill();
+                ctx.strokeStyle = '#0088ff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Forward Cockpit Canopy
+                ctx.beginPath();
+                ctx.moveTo(12, 0);
+                ctx.lineTo(2, -5);
+                ctx.lineTo(-6, -3);
+                ctx.lineTo(-6, 3);
+                ctx.lineTo(2, 5);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(0, 243, 255, 0.4)';
                 ctx.fill();
                 ctx.strokeStyle = '#00f3ff';
-                ctx.lineWidth = 3;
-                ctx.shadowBlur = 12; ctx.shadowColor = '#00f3ff';
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
+                
+                // Engine Thruster Nozzles
+                ctx.beginPath();
+                ctx.rect(-14, -8, 4, 4);
+                ctx.rect(-14, 4, 4, 4);
+                ctx.fillStyle = '#111';
+                ctx.fill();
+                ctx.strokeStyle = '#00f3ff';
+                ctx.stroke();
+
                 ctx.restore();
                 ctx.shadowBlur = 0;
             }
@@ -426,33 +496,68 @@
                 ctx.translate(this.x, this.y);
 
                 let scale = 1 + Math.sin(globalTicks * 0.1 + this.pulsePhase) * 0.14;
+                let rotation = globalTicks * 0.02 + this.pulsePhase;
 
-                // Animated Geometric Outer Matrices
+                // Complex Animated Geometric Outer Matrices (Hexagon)
+                ctx.rotate(rotation);
                 ctx.strokeStyle = this.color;
-                ctx.lineWidth = 3;
-                ctx.shadowBlur = 12; ctx.shadowColor = this.color;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 15; ctx.shadowColor = this.color;
                 
-                ctx.strokeRect(-12 * scale, -12 * scale, 24 * scale, 24 * scale);
-                
-                // Tech Core Node
                 ctx.beginPath();
-                ctx.arc(0, 0, 6, 0, Math.PI * 2);
-                ctx.fillStyle = '#0a0a0f';
-                ctx.fill();
+                for (let i = 0; i < 6; i++) {
+                    let angle = (Math.PI * 2 / 6) * i;
+                    let hx = Math.cos(angle) * (18 * scale);
+                    let hy = Math.sin(angle) * (18 * scale);
+                    if (i === 0) ctx.moveTo(hx, hy);
+                    else ctx.lineTo(hx, hy);
+                }
+                ctx.closePath();
                 ctx.stroke();
+
+                // Counter-rotating Inner Matrix (Triangle)
+                ctx.rotate(-rotation * 2.5);
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    let angle = (Math.PI * 2 / 3) * i;
+                    let tx = Math.cos(angle) * (10 * scale);
+                    let ty = Math.sin(angle) * (10 * scale);
+                    if (i === 0) ctx.moveTo(tx, ty);
+                    else ctx.lineTo(tx, ty);
+                }
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.8)';
+                ctx.fill();
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Glowing Tech Core Node
+                ctx.beginPath();
+                ctx.arc(0, 0, 4 * scale, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 20; ctx.shadowColor = '#ffffff';
+                ctx.fill();
 
                 ctx.restore();
                 ctx.shadowBlur = 0;
 
-                // Glowing Floating Indicator Health Bar
-                let barW = 34;
-                let barH = 4;
-                ctx.fillStyle = 'rgba(255,255,255,0.12)';
-                ctx.fillRect(this.x - barW/2, this.y - this.radius - 12, barW, barH);
+                // Polished Glowing Floating Health Bar
+                let barW = 40;
+                let barH = 5;
+                let yOffset = this.radius + 16;
                 
+                // BG bar
+                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.fillRect(this.x - barW/2 - 1, this.y - yOffset - 1, barW + 2, barH + 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillRect(this.x - barW/2, this.y - yOffset, barW, barH);
+
+                // HP bar
                 let ratio = Math.max(0, this.hp / this.maxHp);
                 ctx.fillStyle = this.color;
-                ctx.fillRect(this.x - barW/2, this.y - this.radius - 12, barW * ratio, barH);
+                ctx.shadowBlur = 10; ctx.shadowColor = this.color;
+                ctx.fillRect(this.x - barW/2, this.y - yOffset, barW * ratio, barH);
+                ctx.shadowBlur = 0;
             }
             update() {
                 const angle = Math.atan2(player.y - this.y, player.x - this.x);
