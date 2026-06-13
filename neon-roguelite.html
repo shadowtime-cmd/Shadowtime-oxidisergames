@@ -147,9 +147,10 @@
         <div class="hud-text" id="hpDisplay" style="color: #00f3ff;">SYS INTEGRITY: 100%</div>
         <div class="hud-text" id="floorDisplay" style="color: #b500ff;">SECTOR: 1 / 10</div>
         <div class="hud-text" id="enemiesDisplay" style="color: #ffaa00;">THREATS REMAINING: 10</div>
+        <div class="hud-text" id="megaMoveDisplay" style="color: #39ff14; margin-top: 15px;">MEGA MOVE: READY (SPACE)</div>
     </div>
     
-    <div id="controls-hint">Desktop: WASD to Move, Mouse to Aim/Shoot | Mobile: Left Stick to Move, Right Stick to Aim/Shoot</div>
+    <div id="controls-hint">Desktop: WASD to Move, Mouse to Aim/Shoot, Space to Mega Move | Mobile: Left Stick to Move, Right Stick to Aim/Shoot</div>
 
     <div id="upgradeScreen" class="overlay">
         <h1 style="color: #b500ff; text-shadow: 0 0 25px #b500ff;">SECTOR CLEARED</h1>
@@ -206,7 +207,7 @@
         ];
 
         // --- CONTROLS HOOKS ---
-        const keys = { w: false, a: false, s: false, d: false };
+        const keys = { w: false, a: false, s: false, d: false, " ": false };
         const mouse = { x: canvas.width / 2, y: canvas.height / 2, down: false };
 
         window.addEventListener('keydown', e => { if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true; });
@@ -350,6 +351,8 @@
                 this.fireRate = 14; 
                 this.fireTimer = 0;
                 this.angle = 0;
+                this.megaMoveCooldown = 0;
+                this.megaMoveMaxCooldown = 600; // 10 seconds at 60fps
             }
             draw() {
                 ctx.save();
@@ -456,7 +459,25 @@
                     }
                 }
                 this.fireTimer++;
+
+                if (this.megaMoveCooldown > 0) {
+                    this.megaMoveCooldown--;
+                } else if (keys[" "]) {
+                    this.triggerMegaMove();
+                }
+
                 this.draw();
+            }
+            triggerMegaMove() {
+                this.megaMoveCooldown = this.megaMoveMaxCooldown;
+                const numProjectiles = 36;
+                for (let i = 0; i < numProjectiles; i++) {
+                    const angle = (Math.PI * 2 / numProjectiles) * i;
+                    const vX = Math.cos(angle) * 15;
+                    const vY = Math.sin(angle) * 15;
+                    projectiles.push(new EnergyProjectile(this.x, this.y, vX, vY));
+                }
+                triggerExplosionMatrix(this.x, this.y, '#39ff14');
             }
         }
 
@@ -618,9 +639,19 @@
         }
 
         function syncHUDValues() {
-            hpUI.innerText = `SYS INTEGRITY: ${Math.max(0, player.hp)}%`;
-            floorUI.innerText = `SECTOR: ${currentFloor} / ${maxFloors}`;
-            enemiesUI.innerText = `THREATS REMAINING: ${Math.max(0, enemiesToKill - enemiesKilled)}`;
+            document.getElementById('hpDisplay').innerText = `SYS INTEGRITY: ${Math.max(0, player.hp)}%`;
+            document.getElementById('floorDisplay').innerText = `SECTOR: ${currentFloor} / ${maxFloors}`;
+            document.getElementById('enemiesDisplay').innerText = `THREATS REMAINING: ${Math.max(0, enemiesToKill - enemiesKilled)}`;
+
+            const megaDisplay = document.getElementById('megaMoveDisplay');
+            if (player.megaMoveCooldown <= 0) {
+                megaDisplay.innerText = "MEGA MOVE: READY (SPACE)";
+                megaDisplay.style.color = "#39ff14";
+            } else {
+                const secondsLeft = Math.ceil(player.megaMoveCooldown / 60);
+                megaDisplay.innerText = `MEGA MOVE: COOLDOWN (${secondsLeft}s)`;
+                megaDisplay.style.color = "#ff0055";
+            }
         }
 
         // --- CORE GAME LOOP ENGINE ---
